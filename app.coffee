@@ -76,7 +76,12 @@ app.post '/', (req, res) ->
 
 app.get '/play', (req, res) ->
 
-  res.render (if req.isAuthenticated() then 'play/auth' else 'play/no_auth'), user: JSON.stringify(req.user or null)
+  everyone.count (count)->
+
+    if count < 15
+      res.render (if req.isAuthenticated() then 'play/auth' else 'play/no_auth'), user: JSON.stringify(req.user or null)
+    else
+      res.send 'Too many players, sorry!'
 
 app.get '/auth', passport.authenticate 'facebook', successRedirect: '/play', failureRedirect: '/play', scope: ['publish_actions'], display: 'touch'
 
