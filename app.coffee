@@ -58,6 +58,10 @@ app.configure ->
   app.use express.errorHandler()
 
 # Define Express routes
+app.all '/', (req, res) ->
+
+  res.render 'web/available'
+
 app.get '/play', (req, res) ->
 
   res.render (if req.isAuthenticated() then 'play/auth' else 'play/no_auth'), user: JSON.stringify(req.user or null)
@@ -69,3 +73,22 @@ server = http.createServer(app).listen app.get('port')
 
 # Initialise NowJS
 everyone = nowjs.initialize server
+
+everyone.now.backfill_players = ->
+
+  everyone.getUsers (players) ->
+
+    players.forEach (id) ->
+
+      nowjs.getClient id, ->
+
+        console.log @now
+
+        if !@now.user
+          return
+
+        everyone.now.receive_new_player @now.user
+
+everyone.now.new_player = ->
+
+  everyone.now.receive_new_player @now.user
