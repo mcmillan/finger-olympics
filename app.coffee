@@ -10,6 +10,10 @@ passportFacebookStrategy = require('passport-facebook').Strategy
 # Require NowJS
 nowjs = require('now')
 
+# Require Shred
+shred = require('shred')
+shred = new shred(logCurl: true)
+
 # Get configuration from config.coffee (not in repo for obvious reasons, app secret theft sucks)
 config = require('./config.coffee')
 
@@ -23,6 +27,8 @@ passport.use(
     callbackURL: '/auth', # hard coding ftw
 
     (access_token, refresh_token, profile, done) ->
+
+      profile.access_token = access_token
 
       done null, profile
 
@@ -58,7 +64,11 @@ app.configure ->
   app.use express.errorHandler()
 
 # Define Express routes
-app.all '/', (req, res) ->
+app.get '/', (req, res) ->
+
+  res.redirect 'http://apps.facebook.com/fingerolympics/'
+
+app.post '/', (req, res) ->
 
   qr_url = 'https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=' + encodeURIComponent('http://' + req.headers.host + '/play')
 
@@ -76,6 +86,8 @@ server = http.createServer(app).listen app.get('port')
 # Initialise NowJS
 everyone = nowjs.initialize server
 
+race_occurring = false
+
 everyone.now.backfill_players = ->
 
   everyone.getUsers (players) ->
@@ -92,6 +104,52 @@ everyone.now.backfill_players = ->
 everyone.now.new_player = ->
 
   everyone.now.receive_new_player @now.user
+
+everyone.now.start_game = ->
+
+  everyone.getUsers (players) ->
+
+    players.forEach (id) ->
+
+      nowjs.getClient id, ->
+
+        if !@now.user
+          return
+
+        everyone.now.add_lane @now.user
+  
+    everyone.now.show_game()
+    race_occurring = true
+
+everyone.now.on_tap = ->
+
+  if !@now.user or !race_occurring
+    return
+
+  if !@now.position?
+    @now.position = 1
+  else
+    @now.position += 1
+
+  if @now.position >= 100
+    everyone.now.post_og @now.user
+    everyone.now.finished @now.user
+    race_occurring = false
+    return
+
+  everyone.now.move @now.user.id, @now.position
+
+everyone.now.post_og = (winner) ->
+
+  if !@now.user or !@now.user.access_token
+    return
+
+  action = if winner.id is @now.user.id then 'win' else 'lose'
+
+  shred.post
+
+    url: 'https://graph.facebook.com/me/fingerolympics:' + action
+    body: 'access_token=' + @now.user.access_token + '&event=http://sallyokelly.co.uk/josh/object.html'
 
 nowjs.on 'disconnect', ->
 

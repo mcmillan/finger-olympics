@@ -1,3 +1,11 @@
+clearfix()
+	&:before
+	&:after
+		content: ""
+		display: table
+	&:after
+		clear: both
+
 *
 
 	margin: 0
@@ -14,45 +22,98 @@ body
 		width: 200px
 
 	.container
-
+		
 		margin: 0 auto
 		width: 760px
 
-		.intro
+		.splash
 
-			float: left
-			width: 500px
+			clearfix()
 
-			h1
+			.intro
 
-				margin-bottom: 5px
+				float: left
+				width: 500px
 
-		.users
+				h1
 
-			float: right
-			width: 240px
+					margin-bottom: 5px
 
-			border: 1px #ccc solid
+			.users
 
-			border-radius: 4px
+				float: right
+				width: 240px
 
-			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)
+				border: 1px #ccc solid
 
-			div
+				border-radius: 4px
 
-				border-top: 1px #ddd solid
-				padding: 10px
-				line-height: 50px
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)
 
-				img
+				div
 
-					float: left
-					margin-right: 10px
+					border-top: 1px #ddd solid
+					padding: 10px
+					line-height: 50px
+
+					img
+
+						float: left
+						margin-right: 10px
+
+					&:first-child
+
+						border-top: none
+
+					&.no-players
+
+						line-height: 16px
+
+		.game
+
+			display: none
+
+			margin: 12px
+
+			box-shadow: 0 0 15px rgba(0, 0, 0, 0.3)
+
+			> div
+
+				border-bottom: 3px #fff solid
+
+				padding: 5px
+
+				background: spin(darken(#bf8369, 10%),5%)
+
+				height: 50px
+
+				position: relative
+
+				-webkit-transition: 0.5s ease all
+				transition: 0.5s ease all
 
 				&:first-child
 
-					border-top: none
+					border-top: 3px #fff solid
 
-				&.no-players
+				img
 
-					line-height: 16px
+					position: absolute
+					top: 5px
+					left: 5px
+
+					-webkit-transition: 0.1s linear all
+					transition: 0.1s linear all
+
+				.end
+
+					width: 3px
+					height: 60px
+					background: #fff
+					position: absolute
+					top: 0
+					left: 650px
+
+				&.winner
+
+					background: darken(gold, 8%)

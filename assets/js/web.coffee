@@ -2,7 +2,7 @@ update_intro_wording = ->
 
 	count = $('.users div[data-id]').length
 
-	if count > 0
+	if count > 1
 		$('.intro p').html 'OK, let\'s play! <a href="#" class="begin">Start the game</a> to get going.'
 	else
 		$('.intro p').html 'We\'re waiting for ' + (2 - count) + ' more player' + (if count isnt 1 then 's' else '') + ' right now. Scan the QR code to get going.'
@@ -31,6 +31,34 @@ now.ready ->
 			update_intro_wording()
 
 	now.backfill_players()
+
+	now.add_lane = (user) ->
+
+		if $('.game .lane[data-id=' + user.id + ']').length isnt 0
+			return
+
+		$('<div class="lane" data-id="' + user.id + '"><div class="end"></div><img src="//graph.facebook.com/' + user.id + '/picture"></div>').appendTo('.game')
+
+	now.show_game = ->
+
+		$('.splash').fadeOut 300
+		$('.game').delay(300).fadeIn 300
+
+	now.move = (user_id, position) ->
+
+		position = 595 * (position / 100)
+		$('.game .lane[data-id=' + user_id + '] img').css 'left', position
+
+	now.finished = (winner) ->
+
+		$('.game .lane[data-id=' + winner.id + ']').addClass 'winner'
+
+		setTimeout ->
+
+			$('.game').fadeOut 300, -> $(this).empty()
+			$('.splash').delay(300).fadeIn 300
+
+		, 2500
 
 	$('.intro p').on 'click', 'a', (event) ->
 
