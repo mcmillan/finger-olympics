@@ -1,0 +1,26 @@
+!!!
+html
+
+	head
+
+		meta(charset='utf-8')
+		meta(name='viewport', content='width=device-width, user-scalable=no')
+
+		title Let's play!
+
+		!= css('play')
+
+
+	body
+
+		.container
+
+			block content
+
+		script
+
+			var user = #{user};
+
+		script(src='/nowjs/now.js')
+		!= js('jquery')
+		!= js('play')

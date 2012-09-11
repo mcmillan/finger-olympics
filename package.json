@@ -13,6 +13,7 @@
     "connect-assets": "*",
     "passport": "*",
     "passport-facebook": "*",
-    "now": "*"
+    "now": "*",
+    "mongoskin": "*"
   }
 }

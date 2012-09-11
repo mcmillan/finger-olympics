@@ -1,7 +1,42 @@
+# Require express + deps
 express = require('express')
 http = require('http')
 path = require('path')
 
+# Require passport + FB strategy
+passport = require('passport')
+passportFacebookStrategy = require('passport-facebook').Strategy
+
+# Require NowJS
+nowjs = require('now')
+
+# Get configuration from config.coffee (not in repo for obvious reasons, app secret theft sucks)
+config = require('./config.coffee')
+
+# Configure passport
+passport.use(
+
+  new passportFacebookStrategy
+
+    clientID: config.facebook.app_id
+    clientSecret: config.facebook.app_secret
+    callbackURL: '/auth', # hard coding ftw
+
+    (access_token, refresh_token, profile, done) ->
+
+      done null, profile
+
+)
+
+passport.serializeUser (user, done) ->
+
+  done null, user
+
+passport.deserializeUser (user, done) ->
+
+  done null, user
+
+# Initialise + configure Express
 app = express()
 
 app.configure ->
@@ -15,8 +50,22 @@ app.configure ->
   app.use express.methodOverride()
   app.use express.cookieParser('pugs are the best')
   app.use express.session()
+  app.use passport.initialize()
+  app.use passport.session()
+  app.use require('connect-assets')()
   app.use app.router
   app.use express.static(path.join(__dirname, 'public'))
   app.use express.errorHandler()
 
-http.createServer(app).listen app.get('port')
+# Define Express routes
+app.get '/play', (req, res) ->
+
+  res.render (if req.isAuthenticated() then 'play/auth' else 'play/no_auth'), user: JSON.stringify(req.user or null)
+
+app.get '/auth', passport.authenticate 'facebook', successRedirect: '/play', failureRedirect: '/play', scope: ['publish_actions'], display: 'touch'
+
+# Boot up server
+server = http.createServer(app).listen app.get('port')
+
+# Initialise NowJS
+everyone = nowjs.initialize server
