@@ -60,7 +60,9 @@ app.configure ->
 # Define Express routes
 app.all '/', (req, res) ->
 
-  res.render 'web/available'
+  qr_url = 'https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=' + encodeURIComponent('http://' + req.headers.host + '/play')
+
+  res.render 'web/available', qr: qr_url
 
 app.get '/play', (req, res) ->
 

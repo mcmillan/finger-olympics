@@ -2,11 +2,19 @@ extends layout
 
 block content
 
-	.intro
+	.splash
 
-		h1 Welcome to the Finger Olympics!
-		p.players We're waiting for some more players right now. Scan the QR code to get going.
+		.intro
 
-	.users
+			h1 Welcome to the Finger Olympics!
+			p.players We're waiting for 2 more players right now. Scan the QR code to get going.
 
-		.no-players There's currently nobody playing.
+			img(src=qr)
+
+		.users
+
+			.no-players There's currently nobody playing.
+
+	.game
+
+		
