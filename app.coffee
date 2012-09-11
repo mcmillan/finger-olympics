@@ -78,6 +78,8 @@ app.get '/play', (req, res) ->
 
   everyone.count (count)->
 
+    console.log count
+
     if count < 15
       res.render (if req.isAuthenticated() then 'play/auth' else 'play/no_auth'), user: JSON.stringify(req.user or null)
     else
