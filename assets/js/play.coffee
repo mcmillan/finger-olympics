@@ -4,3 +4,5 @@ now.ready ->
 		return
 
 	now.user = user
+
+	now.new_player user

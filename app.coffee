@@ -82,8 +82,6 @@ everyone.now.backfill_players = ->
 
       nowjs.getClient id, ->
 
-        console.log @now
-
         if !@now.user
           return
 
@@ -92,3 +90,7 @@ everyone.now.backfill_players = ->
 everyone.now.new_player = ->
 
   everyone.now.receive_new_player @now.user
+
+nowjs.on 'disconnect', ->
+
+  everyone.now.receive_lost_player @now.user
